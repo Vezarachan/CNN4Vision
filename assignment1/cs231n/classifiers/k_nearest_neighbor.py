@@ -77,7 +77,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                dists[i, j] = np.sqrt(np.sum(np.power(self.X_train[j] - X[i], 2)))
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -101,7 +101,7 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            dists[i, :] = np.sqrt(np.sum(np.power(self.X_train - X[i, :], 2), axis=1))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -130,8 +130,12 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        # X = [xi1, xi2, ..., xin]
+        # X_train = [tj1, tj2, ..., tjn]
+        # dist_ij = X * X^T - 2 * X * X_train^T + X_train * X_train^T
+        a = np.sum(np.power(X, 2), axis=1).reshape(num_test, 1)
+        b = np.transpose(np.sum(np.power(self.X_train, 2), axis=1)).reshape(1, num_train)
+        dists = np.sqrt(a - 2 * np.matmul(X, np.transpose(self.X_train)) + b)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +168,12 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            # get ith row of distance matrix
+            dist_row = dists[i]
+            # find k indices of training data with minimum distances
+            nearest_indices = np.argsort(dist_row)[0:k]
+            # get k nearest training data
+            closest_y = self.y_train[nearest_indices]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -175,8 +184,10 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-            pass
+            # vote for label with max number
+            label = np.bincount(closest_y).argmax()
+            # confer vote result to prediction of y
+            y_pred[i] = label
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
