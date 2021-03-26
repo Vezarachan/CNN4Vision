@@ -4,7 +4,7 @@
 
 ### Definition
 
-![查看源图像](./CNN4Vision [1].assets/OIP.ATHJJgZxkixmln_ecCPIAwHaEt)
+![cat](./CNN4Vision [1].assets/cat.jpg)
 
 ### The problem
 
