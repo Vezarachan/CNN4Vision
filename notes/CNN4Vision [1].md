@@ -4,7 +4,7 @@
 
 ### Definition
 
-![cat](./CNN4Vision [1].assets/cat.jpg)
+<img src="./CNN4Vision [1].assets/cat.jpg" style="zoom: 100%;" />
 
 ### The problem
 
