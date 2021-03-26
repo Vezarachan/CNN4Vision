@@ -3,7 +3,7 @@
 > Assignments for CS231n (Convolutional Neural Network for Vision Recognition)
 
 ## Assignment 1
-- [ ] Q1: k-Nearest Neighbor classifier
+- [x] Q1: k-Nearest Neighbor classifier
 - [ ] Q2: Training a Support Vector Machine
 - [ ] Q3: Implement a Softmax classifier
 - [ ] Q4: Two-Layer Neural Network
