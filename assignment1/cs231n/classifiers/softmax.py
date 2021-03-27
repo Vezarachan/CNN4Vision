@@ -33,7 +33,21 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = X.shape[0]
+    C = W.shape[1]
+    
+    for i in range(N):
+        scores = X[i].dot(W)
+        correct_class_score = scores[y[i]]
+        loss += -correct_class_score + np.log(np.sum(np.exp(scores)))
+        for j in range(C):
+            dW[:, j] += X[i] * np.exp(X[i].dot(W[:, j])) / np.sum(np.exp(X[i].dot(W)))
+        dW[:, y[i]] += -X[i]
+    
+    loss += reg * np.sum(np.square(W))
+    loss /= N
+    dW /= N
+    dW += 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -58,7 +72,19 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = X.shape[0]
+    scores = X.dot(W)
+    correct_class_scores = scores[np.arange(N), y]
+    loss += np.sum(-correct_class_scores + np.log(np.sum(np.exp(scores), axis=1)))
+    loss /= N
+    loss += reg * np.sum(np.square(W))
+    grad_scores = np.ones_like(scores)
+    exp_scores = np.exp(scores)
+    grad_scores *= exp_scores / np.sum(exp_scores, axis=1).reshape(N, 1)
+    grad_scores[np.arange(N), y] -= 1
+    dW = np.dot(X.T, grad_scores)
+    dW /= N
+    dW += 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

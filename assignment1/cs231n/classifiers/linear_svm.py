@@ -36,6 +36,9 @@ def svm_loss_naive(W, X, y, reg):
             margin = scores[j] - correct_class_score + 1 # note delta = 1
             if margin > 0:
                 loss += margin
+                dW[:, y[i]] -= X[i].T
+                dW[:, j] += X[i].T
+                
 
     # Right now the loss is a sum over all training examples, but we want it
     # to be an average instead so we divide by num_train.
@@ -51,10 +54,11 @@ def svm_loss_naive(W, X, y, reg):
     # it may be simpler to compute the derivative at the same time that the     #
     # loss is being computed. As a result you may need to modify some of the    #
     # code above to compute the gradient.                                       #
-    #############################################################################
+    #########################w####################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dW /= num_train
+    dW += 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     
@@ -78,8 +82,16 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
-
+    N = X.shape[0]
+    C = W.shape[1]
+    scores = X.dot(W)
+    correct_class_scores = scores[np.arange(N), y].reshape(N, 1)
+    margins = np.maximum(scores - correct_class_scores + 1, 0)
+    margins[np.arange(N), y] = 0
+    loss += np.sum(margins)
+    loss /= N
+    loss += 0.5 * reg * np.sum(W * W)
+    
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     #############################################################################
@@ -92,8 +104,13 @@ def svm_loss_vectorized(W, X, y, reg):
     # loss.                                                                     #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-    pass
+    
+    grad_scores = np.zeros_like(scores) # N * C
+    grad_scores[margins > 0] = 1
+    grad_scores[np.arange(N), y] = -np.sum(grad_scores, axis=1)
+    dW = np.dot(X.T, grad_scores)
+    dW /= N
+    dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

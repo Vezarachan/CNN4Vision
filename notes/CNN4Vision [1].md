@@ -59,3 +59,15 @@ $$
 <img src="./CNN4Vision [1].assets/image-20210325211238055.png" alt="image-20210325211238055" style="zoom: 33%;" />
 
 <img src="./CNN4Vision [1].assets/image-20210325211313168.png" alt="image-20210325211313168" style="zoom:33%;" />
+
+### Linear Classification
+
+- basic module in neural networks
+- simplest parametric approach
+- can only use one template 
+
+<img src="/Users/louxiayin/Academy/homework/CNN4Vision/notes/CNN4Vision [1].assets/image13.png" alt="查看源图像" style="zoom: 33%;" />
+$$
+f(x,W)=Wx + b
+$$
+ 
