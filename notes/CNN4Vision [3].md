@@ -10,19 +10,18 @@
 
 ### Backpropagation
 
+<img src="./CNN4Vision [3].assets/backpropagation.jpg" alt="backpropagation" style="zoom: 100%;" />
+
 #### Forward
 
-计算每个操作的结果，并将其存储为中间变量，以便后续进行反向更新权重。
+根据计算图将神经网络分解为不同的操作，而后计算每个操作的结果，并将其存储为中间变量，以便后续进行反向更新权重，如上图所示，绿色的数字代表各个节点计算完成后的数值。
+
 
 #### Backward
 
-反向传播梯度更新算法利用神经网络的链式法则逐步对从网络输出端向输入端方向的所有参数进行更新。
+反向传播梯度更新算法利用神经网络的链式法则（chain rulea）逐步对从网络输出端向输入端方向的所有参数进行更新，如上图所示，红色表示反向的梯度计算值。 反向传播将复杂的梯度计算分解为简单的计算（如乘法、加法等），从而简化了其梯度的解析式。对于某一个节点，其接受上游传递的梯度，而后计算在该节点的梯度，两者相乘，则为当前节点的对于整个损失函数$L$梯度。
 
-<img src="./CNN4Vision [3].assets/backprop-template.png" alt="backpropagation" style="zoom: 33%;" />
-
- 反向传播将复杂的梯度计算分解为简单的计算（如乘法、加法等），从而简化了其梯度的解析式。
-
-<img src="./CNN4Vision [3].assets/backpropagation.jpg" alt="backpropagation" style="zoom: 100%;" />
+<img src="./CNN4Vision [3].assets/backprop-template.png" alt="backpropagation" style="zoom: 20%;" />
 
 - **add** gate -> gradient distributor 只是传递梯度，本身不改变梯度
 - **max** gate -> gradient router 只对具有较大值的参数进行更新（梯度为0或1）
@@ -55,7 +54,5 @@ $$
 - Maxout
 - ELU
 
-![查看源图像](./CNN4Vision [3].assets/1*ZafDv3VUm60Eh10OeJu1vw.png)
-
-#### Achitectures
+<img src="./CNN4Vision [3].assets/1*ZafDv3VUm60Eh10OeJu1vw.png" alt="查看源图像" style="zoom:50%;" />
 
