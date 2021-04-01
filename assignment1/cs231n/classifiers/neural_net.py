@@ -119,22 +119,22 @@ class TwoLayerNet(object):
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         
         # gradient of scores - dZ
-        grad_scores = np.ones_like(scores)
+        grad_scores = np.ones_like(scores) # N * C
         exp_scores = np.exp(scores)
         grad_scores *= exp_scores / np.sum(exp_scores, axis=1).reshape(N, 1)
         grad_scores[np.arange(N), y] -= 1
         grad_scores /= N
         # gradient of W2, d2
-        newh = np.hstack((h, np.ones((N, 1))))
-        dW2 = np.dot(newh.T, grad_scores)
-        grads_max = np.dot(grad_scores, W2.T) * (h > 0)
-        grads['b2'] = dW2[-1, :]
-        grads['W2'] = 2 * reg * W2 + dW2[:-1, :]
+        newh = np.hstack((h, np.ones((N, 1)))) # N * (H + 1)
+        dW2 = np.dot(newh.T, grad_scores) # (H + 1) * C
+        grads_max = np.dot(grad_scores, W2.T) * (h > 0) # N * H
+        grads['b2'] = dW2[-1, :] # 1 * C
+        grads['W2'] = 2 * reg * W2 + dW2[:-1, :] # W2 is composed of two parts: H * C
         # gradient of W1, d1
-        newX = np.hstack((X, np.ones((N, 1))))
-        dW1 = np.dot(newX.T, grads_max)
-        grads['b1'] = dW1[-1, :]
-        grads['W1'] = 2 * reg * W1 + dW1[:-1, :]
+        newX = np.hstack((X, np.ones((N, 1)))) # N * (D + 1)
+        dW1 = np.dot(newX.T, grads_max) # (D + 1) * H
+        grads['b1'] = dW1[-1, :] # 1 * H
+        grads['W1'] = 2 * reg * W1 + dW1[:-1, :] # W1 is composed of two parts: D * H
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -247,7 +247,6 @@ class TwoLayerNet(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        
         W1 = self.params['W1']
         b1 = self.params['b1']
         W2 = self.params['W2']
