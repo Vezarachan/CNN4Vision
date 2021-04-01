@@ -79,8 +79,11 @@ class TwoLayerNet(object):
         # shape (N, C).                                                             #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        
+        H = b1.shape[0]
+        C = b2.shape[0]
+        h = np.maximum(0, X.dot(W1) + b1.reshape(1, H)) # (N * D) and (D * H) => N * H
+        scores = h.dot(W2) + b2.reshape(1, C) # (N * H) and (H, C) => N * C
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -98,7 +101,11 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        loss = 0.0
+        correct_class_scores = scores[np.arange(N), y]
+        loss += np.sum(-correct_class_scores + np.log(np.sum(np.exp(scores), axis=1)))
+        loss /= N
+        loss += reg * (np.sum(np.square(W1)) + np.sum(np.square(W2)))
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -110,8 +117,24 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        
+        # gradient of scores - dZ
+        grad_scores = np.ones_like(scores)
+        exp_scores = np.exp(scores)
+        grad_scores *= exp_scores / np.sum(exp_scores, axis=1).reshape(N, 1)
+        grad_scores[np.arange(N), y] -= 1
+        grad_scores /= N
+        # gradient of W2, d2
+        newh = np.hstack((h, np.ones((N, 1))))
+        dW2 = np.dot(newh.T, grad_scores)
+        grads_max = np.dot(grad_scores, W2.T) * (h > 0)
+        grads['b2'] = dW2[-1, :]
+        grads['W2'] = 2 * reg * W2 + dW2[:-1, :]
+        # gradient of W1, d1
+        newX = np.hstack((X, np.ones((N, 1))))
+        dW1 = np.dot(newX.T, grads_max)
+        grads['b1'] = dW1[-1, :]
+        grads['W1'] = 2 * reg * W1 + dW1[:-1, :]
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -156,7 +179,10 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            batch = list(np.arange(num_train))
+            idxs = np.random.choice(batch, size=batch_size)
+            X_batch = X[idxs]
+            y_batch = y[idxs]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -172,7 +198,10 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.params['W2'] -= learning_rate * grads['W2']
+            self.params['b2'] -= learning_rate * grads['b2']
+            self.params['W1'] -= learning_rate * grads['W1']
+            self.params['b1'] -= learning_rate * grads['b1']
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -218,7 +247,18 @@ class TwoLayerNet(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        
+        W1 = self.params['W1']
+        b1 = self.params['b1']
+        W2 = self.params['W2']
+        b2 = self.params['b2']
+        N = X.shape[0]
+        H = b1.shape[0]
+        C = b2.shape[0]
+        h = np.maximum(0, X.dot(W1) + b1.reshape(1, H)) # (N * D) and (D * H) => N * H
+        scores = h.dot(W2) + b2.reshape(1, C) # (N * H) and (H, C) => N * C
+        scores = np.exp(scores) / np.sum(np.exp(scores), axis=1).reshape(N, 1)
+        y_pred = np.argmax(scores, axis=1)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 

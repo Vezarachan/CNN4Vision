@@ -20,6 +20,8 @@ Semantic gap between the semantic idea of cat and pixels - 从像素（图像）
 6. background clutter 背景杂物
 7. Intra-class variation 类内差异
 
+<img src="/Users/louxiayin/Academy/homework/CNN4Vision/notes/CNN4Vision [1].assets/image-20210328221146017.png" alt="image-20210328221146017" style="zoom:50%;" />
+
 ### Data-driven approach
 
 1. Collect a dataset of images and labels - **Input**
@@ -70,4 +72,3 @@ $$
 $$
 f(x,W)=Wx + b
 $$
- 
