@@ -28,7 +28,10 @@ def affine_forward(x, w, b):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = x.shape[0]
+    M = w.shape[1]
+    reshaped_x = x.reshape(N, -1) # N * D
+    out = reshaped_x.dot(w) + b.reshape(1, M) # N * M
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -60,8 +63,18 @@ def affine_backward(dout, cache):
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-    pass
+    
+    D = w.shape[0]
+    M = w.shape[1]
+    N = x.shape[0]
+    reshaped_x = x.reshape(N, -1) # N * D - shape of x should not be changed
+    new_x = np.hstack((reshaped_x, np.ones((N, 1)))) # N * (D + 1)
+    dw_new = np.dot(dout.T, new_x) # M * (D + 1)
+    dw = dw_new[:, :D].T # D * M 
+    db = dw_new[:, -1] # M * 1
+    new_w = np.vstack((w, b.T)) # (D + 1) * M
+    dx = dout.dot(new_w.T)[:, :D]
+    dx = dx.reshape(x.shape)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -87,7 +100,7 @@ def relu_forward(x):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    out = np.maximum(x, 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -114,7 +127,8 @@ def relu_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # max gate actually means which route is accesible
+    dx = dout * (x > 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################

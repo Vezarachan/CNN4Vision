@@ -55,7 +55,10 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        self.params['W1'] = np.random.normal(0, weight_scale, (input_dim, hidden_dim))
+        self.params['b1'] = np.zeros(hidden_dim)
+        self.params['W2'] = np.random.normal(0, weight_scale, (hidden_dim, num_classes))
+        self.params['b2'] = np.zeros(num_classes)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -88,7 +91,11 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        affine_1, cache_affine_1 = affine_forward(X, self.params['W1'], self.params['b1'])
+        relu_1, cache_relu_1 = relu_forward(affine_1)
+        affine_2, cache_affine_2 = affine_forward(relu_1, self.params['W2'], self.params['b2'])
+        relu_2, cache_relu_2 = relu_forward(affine_2)
+        scores = relu_2
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -112,7 +119,21 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        W1 = self.params['W1']
+        W2 = self.params['W2']
+        N = X.shape[0]
+        loss, dx = softmax_loss(scores, y)
+        loss += 0.5 * self.reg * (np.sum(np.square(W1)) + np.sum(np.square(W2)))
+        relu_back_1 = relu_backward(dx, cache_relu_2)
+        dX2, dW2, db2 = affine_backward(relu_back_1, cache_affine_2)
+        dW2 += self.reg * W2
+        relu_back_2 = relu_backward(dX2, cache_relu_1)
+        _, dW1, db1 = affine_backward(relu_back_2, cache_affine_1)
+        dW1 += self.reg * W1
+        grads['W1'] = dW1
+        grads['W2'] = dW2
+        grads['b1'] = db1
+        grads['b2'] = db2
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
