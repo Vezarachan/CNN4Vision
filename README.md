@@ -10,7 +10,7 @@
 - [x] Q5: Higher Level Representations: Image Features
 
 ## Assignment 2
-- [ ] Q1: Fully-connected Neural Network
+- [x] Q1: Fully-connected Neural Network
 - [ ] Q2: Batch Normalization
 - [ ] Q3: Dropout
 - [ ] Q4: Convolutional Networks
