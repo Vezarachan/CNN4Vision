@@ -31,7 +31,7 @@ def affine_forward(x, w, b):
     N = x.shape[0]
     M = w.shape[1]
     reshaped_x = x.reshape(N, -1) # N * D
-    out = reshaped_x.dot(w) + b.reshape(1, M) # N * M
+    out = reshaped_x.dot(w) + b.reshape(1, -1) # N * M
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################

@@ -6,6 +6,8 @@
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
+*/datasets/cifar-10-batches-py/
+
 # IPython
 profile_default/
 ipython_config.py

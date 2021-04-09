@@ -212,8 +212,21 @@ class FullyConnectedNet(object):
         # parameters should be initialized to zeros.                               #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        
+        for i in range(self.num_layers):
+            if i == 0:
+                self.params['W1'] = weight_scale * np.random.randn(input_dim, hidden_dims[i]).astype(dtype)
+                self.params['b1'] = np.zeros(hidden_dims[i])
+            else:
+                if i < self.num_layers - 1: # i = 1, 2, ..., L - 2 => layer = 2, 3, ..., L - 1
+                    in_dim = hidden_dims[i - 1]
+                    out_dim = hidden_dims[i]
+                    self.params[f'W{i + 1}'] = weight_scale * np.random.randn(in_dim, out_dim).astype(dtype)
+                    self.params[f'b{i + 1}'] = np.zeros(out_dim)
+                else: # layer = L
+                    in_dim = hidden_dims[i - 1] 
+                    self.params[f'W{i + 1}'] = weight_scale * np.random.randn(in_dim, num_classes).astype(dtype)
+                    self.params[f'b{i + 1}'] = np.zeros(num_classes)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -275,7 +288,27 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        regularization_scores = 0.0 # store the regularization 
+        cache_affine = {} # store the values of every node performing affine operation
+        cache_relu = {} # store the values of every node performing ReLU operation
+        _X = X.copy() # a copy of X with N * D
+        
+        # for each hidden layer
+        for i in range(self.num_layers):
+            layer_weights = self.params[f'W{i + 1}']
+            layer_bias = self.params[f'b{i + 1}']
+            # add up value of regularization of each layer
+            regularization_scores += 0.5 * self.reg * np.sum(np.square(layer_weights))
+            if i == self.num_layers - 1: # layer = L
+                _X, cache_affine[i + 1] = affine_forward(_X, layer_weights, layer_bias)
+            else: # layer = 1, 2, ..., L - 1
+                # get the weights and biases of each layer
+                layer_weights = self.params[f'W{i + 1}']
+                layer_bias = self.params[f'b{i + 1}']
+                # forward operations
+                _X, cache_affine[i + 1] = affine_forward(_X, layer_weights, layer_bias)
+                _X, cache_relu[i + 1] = relu_forward(_X) 
+        scores = _X
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -302,7 +335,21 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # calculate loss value and gradient dL/dz 
+        loss, dz = softmax_loss(scores, y)
+        # add regularization to loss
+        loss += regularization_scores
+        dX, dW, db = affine_backward(dz, cache_affine[self.num_layers])
+        dW += self.reg * self.params['W{0}'.format(self.num_layers)]
+        grads['W{0}'.format(self.num_layers)] = dW 
+        grads['b{0}'.format(self.num_layers)] = db
+        for i in range(1, self.num_layers):
+            layer = self.num_layers - i
+            relu_back = relu_backward(dX, cache_relu[layer])
+            dX, dW, db = affine_backward(relu_back, cache_affine[layer])
+            dW += self.reg * self.params['W{0}'.format(layer)]
+            grads['W{0}'.format(layer)] = dW 
+            grads['b{0}'.format(layer)] = db
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################

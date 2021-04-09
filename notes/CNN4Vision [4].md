@@ -48,4 +48,3 @@ $32\times 32\times 3$ images and $5\times 5\times 3$ filter (weights) $\Rightarr
 ### Fully Connected Layer
 
 <img src="./CNN4Vision [4].assets/fc.jpg" alt="fc"  />
-
