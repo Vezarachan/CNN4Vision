@@ -19,6 +19,13 @@ v_{t+1}=\rho v_t - \nabla f(x_t)\\x_{t+ 1} = x_t - \alpha v_{t+1}
 $$
 速度的存在使得梯度下降即使在梯度较小的时候也可以保持一定的速度，从而帮助算法越过局部最小值与鞍点。
 
+```python
+v = mu * v - learning_rate * dx
+x += v
+```
+
+<img src="./CNN4Vision [6].assets/momentum.jpg" alt="查看源图像" style="zoom:50%;" />
+
 #### Nesterov Momentum
 
 Nesterov Momentum首先取得速度方向上步进一定距离，而后在该位置上取梯度。
@@ -36,6 +43,8 @@ v_{t+1} = \rho v_t - \alpha\nabla f(\bar{x}_t)\\
 &=\bar{x}_t + v_{t+1} + \rho (v_{t+1} - v_t)
 \end{aligned}
 $$
+
+<img src="./CNN4Vision [6].assets/image-20210413220316902.png" alt="image-20210413220316902" style="zoom: 60%;" />
 
 #### AdaGrad
 
@@ -61,7 +70,7 @@ while True:
 
 RMSProp梯度下降方法对梯度平方和施加了一个衰减率，这类似于动量的方法，只不过是对梯度平方和的估计添加动量。
 
-#### Adam
+#### :star:Adam
 
 ##### Original idea - combine Momenta and Adagrad/RMSProp
 
@@ -126,7 +135,49 @@ $$
 
 ### Regularization
 
+#### Dropout
+
+在每一次前向传递时，以一定的概率随机设置**激活函数层的**某些神经元为0。其中抛弃神经元的概率为一个超参数，通常为0.5。
+
+```python
+def train_step(X):
+  H1 = np.maximum(0, np.dot(W1, X) + b1)
+  U1 = np.random.rand(*H1.shape) < p # first dropout mask
+  H1 *= U1
+  H2 = np.maximum(0, np.dot(W2, H1) + b2)
+  U2 = np.random.rand(*H2.shape) < p # second dropout mask
+  H2 *= U2
+  out = np.dot(W3, H2) + b3
+  
+def predict(X):
+  H1 = H1 = np.maximum(0, np.dot(W1, X) + b1) * p
+  H2 = np.maximum(0, np.dot(W2, H1) + b2) * p
+  out = np.dot(W3, H2) + b3
+```
+
+相较于batch normalization，dropout更加便于调整（超参数p）。
+
+#### Data Augmentation
+
+Horizontal Flip
+
+Random crops and scales
+
+Color Jitter 色彩抖动
+
+#### DropConnect
+
+随机将权重矩阵中的一些权重置为零
+
+#### Fractional Max Pooling
+
+在池化层操作时，随机池化当前正在池化的数据。
+
+#### Stochastic Depth
+
+训练时随机丢弃一些层，使用部分层，但在测试时使用所有层。
+
+<img src="./CNN4Vision [6].assets/image-20210414103058565.png" alt="image-20210414103058565" style="zoom:50%;" />
 
 
-### Transfer Learning
 

@@ -19,6 +19,7 @@ $$
 1. Saturated neurons "kill" the gradient - 梯度消失问题（当输出过大或过小时，其梯度趋向于0）
 2. Sigmoid output is not zero-centered - Sigmoid的梯度总是大于0，从而无法通过正负来逼近最佳的路径，这使得参数更新速度变慢
 3. exp() is a bit compute expensive - 指数运算耗费计算资源
+4. 一般在神经网络中不会使用sigmoid，一个是该激活函数固有的饱和问题，另一个则是计算复杂性的问题
 
 #### tanh
 
@@ -31,6 +32,7 @@ $$
 ##### Problems:
 
 1. tanh kills gradients when saturated - 同样存在梯度消失的现象
+2. $\tanh$是一个零中心函数
 
 #### ReLU
 
@@ -134,7 +136,7 @@ w = np.random.randn(n) / sqrt(n)
 
 稀疏初始化将权重矩阵的值置为0，然后随机选择少数的神经元进行连接。
 
-#### MSRA initialization
+#### [MSRA/He initialization](https://openaccess.thecvf.com/content_iccv_2015/papers/He_Delving_Deep_into_ICCV_2015_paper.pdf)
 
 `对于使用ReLU激活函数的神经网络，一般采用如下的参数初始化：`
 
@@ -173,7 +175,8 @@ dropout也是一种非常有效的、简单的正则化手段，在dropout层中
 
 在一些论文中提及使用平方合页损失（squared hinge loss）相较于普通的合页损失具有更佳的表现
 $$
-L_i=\sum_{j\neq y_i}\max(0, f_j - f_{y_i} + 1)
+L_i=\sum_{j\neq y_i}\max(0, f_j - f_{y_i} + 1)\\
+L_i=\sum_{j\neq y_i}\max(0, (f_j - f_{y_i} + 1)^2)
 $$
 
 ##### Softmax

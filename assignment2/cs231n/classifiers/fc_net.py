@@ -217,12 +217,18 @@ class FullyConnectedNet(object):
             if i == 0:
                 self.params['W1'] = weight_scale * np.random.randn(input_dim, hidden_dims[i]).astype(dtype)
                 self.params['b1'] = np.zeros(hidden_dims[i])
+                if self.normalization in ('batchnorm', 'layernorm'):
+                    self.params['gamma1'] = np.ones(hidden_dims[i])
+                    self.params['beta1'] = np.zeros(hidden_dims[i])
             else:
                 if i < self.num_layers - 1: # i = 1, 2, ..., L - 2 => layer = 2, 3, ..., L - 1
                     in_dim = hidden_dims[i - 1]
                     out_dim = hidden_dims[i]
                     self.params[f'W{i + 1}'] = weight_scale * np.random.randn(in_dim, out_dim).astype(dtype)
                     self.params[f'b{i + 1}'] = np.zeros(out_dim)
+                    if self.normalization in ('batchnorm', 'layernorm'):
+                        self.params[f'gamma{i + 1}'] = np.ones(out_dim)
+                        self.params[f'beta{i + 1}'] = np.zeros(out_dim)
                 else: # layer = L
                     in_dim = hidden_dims[i - 1] 
                     self.params[f'W{i + 1}'] = weight_scale * np.random.randn(in_dim, num_classes).astype(dtype)
@@ -291,6 +297,8 @@ class FullyConnectedNet(object):
         regularization_scores = 0.0 # store the regularization 
         cache_affine = {} # store the values of every node performing affine operation
         cache_relu = {} # store the values of every node performing ReLU operation
+        cache_normbatch = {}
+        cache_layernorm = {}
         _X = X.copy() # a copy of X with N * D
         
         # for each hidden layer
@@ -307,6 +315,14 @@ class FullyConnectedNet(object):
                 layer_bias = self.params[f'b{i + 1}']
                 # forward operations
                 _X, cache_affine[i + 1] = affine_forward(_X, layer_weights, layer_bias)
+                if self.normalization == "batchnorm":
+                    layer_gamma = self.params[f'gamma{i + 1}']
+                    layer_beta = self.params[f'beta{i + 1}']
+                    _X, cache_normbatch[i + 1] = batchnorm_forward(_X, layer_gamma, layer_beta, self.bn_params[i])
+                if self.normalization == "layernorm":
+                    layer_gamma = self.params[f'gamma{i + 1}']
+                    layer_beta = self.params[f'beta{i + 1}']
+                    _X, cache_layernorm[i + 1] = layernorm_forward(_X, layer_gamma, layer_beta, self.bn_params[i])
                 _X, cache_relu[i + 1] = relu_forward(_X) 
         scores = _X
 
@@ -341,15 +357,26 @@ class FullyConnectedNet(object):
         loss += regularization_scores
         dX, dW, db = affine_backward(dz, cache_affine[self.num_layers])
         dW += self.reg * self.params['W{0}'.format(self.num_layers)]
-        grads['W{0}'.format(self.num_layers)] = dW 
-        grads['b{0}'.format(self.num_layers)] = db
+        grads[f'W{self.num_layers}'] = dW 
+        grads[f'b{self.num_layers}'] = db
         for i in range(1, self.num_layers):
             layer = self.num_layers - i
             relu_back = relu_backward(dX, cache_relu[layer])
-            dX, dW, db = affine_backward(relu_back, cache_affine[layer])
+            if self.normalization == 'batchnorm': # batch normalization
+                batchnorm_back, dgamma, dbeta = batchnorm_backward(relu_back, cache_normbatch[layer])
+                dX, dW, db = affine_backward(batchnorm_back, cache_affine[layer])
+                grads[f'gamma{layer}'] = dgamma
+                grads[f'beta{layer}'] = dbeta
+            elif self.normalization == 'layernorm': # layer normalization
+                layernorm_back, dgamma, dbeta = layernorm_backward(relu_back, cache_layernorm[layer])
+                dX, dW, db = affine_backward(layernorm_back, cache_affine[layer])
+                grads[f'gamma{layer}'] = dgamma
+                grads[f'beta{layer}'] = dbeta
+            else:
+                dX, dW, db = affine_backward(relu_back, cache_affine[layer])
             dW += self.reg * self.params['W{0}'.format(layer)]
-            grads['W{0}'.format(layer)] = dW 
-            grads['b{0}'.format(layer)] = db
+            grads[f'W{layer}'] = dW 
+            grads[f'b{layer}'] = db
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
