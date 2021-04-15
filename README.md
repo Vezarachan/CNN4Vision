@@ -11,8 +11,8 @@
 
 ## Assignment 2
 - [x] Q1: Fully-connected Neural Network
-- [ ] Q2: Batch Normalization
-- [ ] Q3: Dropout
+- [x] Q2: Batch Normalization
+- [x] Q3: Dropout
 - [ ] Q4: Convolutional Networks
 - [ ] Q5: PyTorch / TensorFlow on CIFAR-10
 
