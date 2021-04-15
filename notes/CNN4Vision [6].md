@@ -155,7 +155,27 @@ def predict(X):
   out = np.dot(W3, H2) + b3
 ```
 
-相较于batch normalization，dropout更加便于调整（超参数p）。
+相较于batch normalization，dropout更加便于调整（超参数p）。此外，可以修改上述代码，使得在构造神经网络时更加简洁：
+
+```python
+def train_step(X):
+  H1 = np.maximum(0, np.dot(W1, X) + b1)
+  U1 = (np.random.rand(*H1.shape) < p) / p # first dropout mask
+  H1 *= U1
+  H2 = np.maximum(0, np.dot(W2, H1) + b2)
+  U2 = (np.random.rand(*H2.shape) < p) / p # second dropout mask
+  H2 *= U2
+  out = np.dot(W3, H2) + b3
+  
+def predict(X):
+  H1 = np.maximum(0, np.dot(W1, X) + b1)
+  H2 = np.maximum(0, np.dot(W2, H1) + b2)
+  out = np.dot(W3, H2) + b3
+```
+
+>**关于为什么在测试和预测时需要乘以概率$p$的问题：**
+>
+>因为我们在dropout层中以概率p抛弃神经元时，即(1-p)H个神经元的权重被置为0，最终输出的期望为px + (1 - p)0，为了在测试时或者预测时保持神经元的激活，必须要调整输出$x \rightarrow px$，使其保持一样的期望输出。
 
 #### Data Augmentation
 

@@ -167,6 +167,8 @@ dropout也是一种非常有效的、简单的正则化手段，在dropout层中
 
 <img src="./CNN4Vision [5].assets/dropout.png" alt="查看源图像" style="zoom: 33%;" />
 
+
+
 ### Talk about Loss Function Again
 
 #### Classification
