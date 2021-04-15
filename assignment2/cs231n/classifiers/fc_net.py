@@ -299,6 +299,7 @@ class FullyConnectedNet(object):
         cache_relu = {} # store the values of every node performing ReLU operation
         cache_normbatch = {}
         cache_layernorm = {}
+        cache_dropout = {}
         _X = X.copy() # a copy of X with N * D
         
         # for each hidden layer
@@ -324,6 +325,8 @@ class FullyConnectedNet(object):
                     layer_beta = self.params[f'beta{i + 1}']
                     _X, cache_layernorm[i + 1] = layernorm_forward(_X, layer_gamma, layer_beta, self.bn_params[i])
                 _X, cache_relu[i + 1] = relu_forward(_X) 
+                if self.use_dropout:
+                    _X, cache_dropout[i + 1] = dropout_forward(_X, self.dropout_param)
         scores = _X
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -361,7 +364,12 @@ class FullyConnectedNet(object):
         grads[f'b{self.num_layers}'] = db
         for i in range(1, self.num_layers):
             layer = self.num_layers - i
-            relu_back = relu_backward(dX, cache_relu[layer])
+            if self.use_dropout:
+                dropout_back = dropout_backward(dX, cache_dropout[layer])
+                relu_back = relu_backward(dropout_back, cache_relu[layer])
+            else:
+                relu_back = relu_backward(dX, cache_relu[layer])
+                
             if self.normalization == 'batchnorm': # batch normalization
                 batchnorm_back, dgamma, dbeta = batchnorm_backward(relu_back, cache_normbatch[layer])
                 dX, dW, db = affine_backward(batchnorm_back, cache_affine[layer])

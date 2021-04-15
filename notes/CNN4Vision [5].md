@@ -243,6 +243,17 @@ $$
 
 <img src="./CNN4Vision [5].assets/batch_normalization.png" alt="查看源图像"  />
 
+### Layer Normalization
+
+$$
+\mu^l = \frac{1}{H}\sum_{i=1}^H a_i^l\\
+\sigma^l = \sqrt{\frac{1}{H}\sum_{i=1}^H (a_i^l - \mu^l)^2}
+$$
+
+其中H为层中的隐藏单元的数量
+
+<img src="./CNN4Vision [5].assets/groupnorm-gn-zu.png" alt="查看源图像"  />
+
 ### Hyperparameter Optimization
 
 #### Cross- validation strategy 交叉验证

@@ -150,7 +150,7 @@ def train_step(X):
   out = np.dot(W3, H2) + b3
   
 def predict(X):
-  H1 = H1 = np.maximum(0, np.dot(W1, X) + b1) * p
+  H1 = np.maximum(0, np.dot(W1, X) + b1) * p
   H2 = np.maximum(0, np.dot(W2, H1) + b2) * p
   out = np.dot(W3, H2) + b3
 ```
