@@ -10,7 +10,7 @@
 
 $32\times 32\times 3$ images and $5\times 5\times 3$ filter (weights) $\Rightarrow\ w^Tx + b$ 
 
-一般而言，在卷积神经网络中会采用多种卷积核，不同的卷积核可以从图像中提取出不同的模式（特征），如下图所示
+一般而言，在卷积神经网络中会采用多种卷积核，不同的卷积核可以从图像中提取出不同的模式（特征），如下图所示w
 
 <img src="./CNN4Vision [4].assets/fe7bdaec-36a4-f64e-d521-5981a52b6765.png" alt="See the source image" style="zoom:70%;" />
 
