@@ -14,7 +14,7 @@
 - [x] Q2: Batch Normalization
 - [x] Q3: Dropout
 - [x] Q4: Convolutional Networks
-- [ ] Q5: PyTorch / TensorFlow on CIFAR-10
+- [x] Q5: PyTorch / TensorFlow on CIFAR-10
 
 ## Assignment 3
 - [ ] Q1: Image Captioning with Vanilla RNNs
