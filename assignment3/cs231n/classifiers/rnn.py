@@ -151,7 +151,24 @@ class CaptioningRNN(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        N, _T = captions.shape
+        affine, cache_affine = affine_forward(features, W_proj, b_proj) # N * H
+        embed, cache_embed = word_embedding_forward(captions_in, W_embed) # N * T * W
+        if self.cell_type == 'rnn':
+            rnn, cache_rnn = rnn_forward(embed, affine, Wx, Wh, b)
+        else:
+            pass
+        temporal_affine, cache_temporal_affine = temporal_affine_forward(rnn, W_vocab, b_vocab)
+        loss, dl = temporal_softmax_loss(temporal_affine, captions_out, mask)
+        
+        dtemporal_affine, dW_vocab, db_vocab = temporal_affine_backward(dl, cache_temporal_affine)
+        drnn, dh0, dWx, dWh, db = rnn_backward(dtemporal_affine, cache_rnn)
+        dW_embed = word_embedding_backward(drnn, cache_embed)
+        daffine, dw_proj, db_proj = affine_backward(dh0, cache_affine)
+        grads["W_proj"], grads["b_proj"] = dw_proj, db_proj
+        grads["W_embed"] = dW_embed
+        grads["Wx"], grads["Wh"], grads["b"] = dWx, dWh, db
+        grads["W_vocab"], grads["b_vocab"] = dW_vocab, db_vocab
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -219,7 +236,25 @@ class CaptioningRNN(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        h0, _ = affine_forward(features, W_proj, b_proj)
+        for t in range(max_length):
+            if t == 0:
+                embed, _ = word_embedding_forward(self._start, W_embed)
+                if self.cell_type == 'rnn':
+                    h, _ = rnn_step_forward(embed, h0, Wx, Wh, b)
+                else:
+                    pass
+                scores, _ = affine_forward(h, W_vocab, b_vocab)
+                selected_word = np.argmax(scores, axis=1)
+            else:
+                embed, _ = word_embedding_forward(selected_word, W_embed)
+                if self.cell_type == 'rnn':
+                    h, _ = rnn_step_forward(embed, h, Wx, Wh, b)
+                else:
+                    pass
+                scores, _ = affine_forward(h, W_vocab, b_vocab)
+                selected_word = np.argmax(scores, axis=1)
+            captions[:, t] = selected_word
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
