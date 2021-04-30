@@ -157,12 +157,15 @@ class CaptioningRNN(object):
         if self.cell_type == 'rnn':
             rnn, cache_rnn = rnn_forward(embed, affine, Wx, Wh, b)
         else:
-            pass
+            rnn, cache_rnn = lstm_forward(embed, affine, Wx, Wh, b)
         temporal_affine, cache_temporal_affine = temporal_affine_forward(rnn, W_vocab, b_vocab)
         loss, dl = temporal_softmax_loss(temporal_affine, captions_out, mask)
         
         dtemporal_affine, dW_vocab, db_vocab = temporal_affine_backward(dl, cache_temporal_affine)
-        drnn, dh0, dWx, dWh, db = rnn_backward(dtemporal_affine, cache_rnn)
+        if self.cell_type == 'rnn':
+            drnn, dh0, dWx, dWh, db = rnn_backward(dtemporal_affine, cache_rnn)
+        else:
+            drnn, dh0, dWx, dWh, db = lstm_backward(dtemporal_affine, cache_rnn)
         dW_embed = word_embedding_backward(drnn, cache_embed)
         daffine, dw_proj, db_proj = affine_backward(dh0, cache_affine)
         grads["W_proj"], grads["b_proj"] = dw_proj, db_proj
@@ -237,13 +240,14 @@ class CaptioningRNN(object):
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         h0, _ = affine_forward(features, W_proj, b_proj)
+        c0 = np.zeros_like(h0)
         for t in range(max_length):
             if t == 0:
                 embed, _ = word_embedding_forward(self._start, W_embed)
                 if self.cell_type == 'rnn':
                     h, _ = rnn_step_forward(embed, h0, Wx, Wh, b)
                 else:
-                    pass
+                    h, c, _ = lstm_step_forward(embed, h0, c0, Wx, Wh, b)
                 scores, _ = affine_forward(h, W_vocab, b_vocab)
                 selected_word = np.argmax(scores, axis=1)
             else:
@@ -251,7 +255,7 @@ class CaptioningRNN(object):
                 if self.cell_type == 'rnn':
                     h, _ = rnn_step_forward(embed, h, Wx, Wh, b)
                 else:
-                    pass
+                    h, c, _ = lstm_step_forward(embed, h, c, Wx, Wh, b)
                 scores, _ = affine_forward(h, W_vocab, b_vocab)
                 selected_word = np.argmax(scores, axis=1)
             captions[:, t] = selected_word
