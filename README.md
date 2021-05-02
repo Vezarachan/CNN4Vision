@@ -17,8 +17,8 @@
 - [x] Q5: PyTorch / TensorFlow on CIFAR-10
 
 ## Assignment 3
-- [ ] Q1: Image Captioning with Vanilla RNNs
-- [ ] Q2: Image Captioning with LSTMs
-- [ ] Q3: Network Visualization: Saliency maps, Class Visualization, and Fooling Images
+- [x] Q1: Image Captioning with Vanilla RNNs
+- [x] Q2: Image Captioning with LSTMs
+- [x] Q3: Network Visualization: Saliency maps, Class Visualization, and Fooling Images
 - [ ] Q4: Style Transfer
 - [ ] Q5: Generative Adversarial Networks
