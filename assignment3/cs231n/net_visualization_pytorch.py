@@ -34,7 +34,14 @@ def compute_saliency_maps(X, y, model):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = y.shape
+    _y = model(X)
+    correct_y = _y.gather(1, y.view(-1, 1)).squeeze()
+    # 进行反向传播
+    correct_y.backward(torch.FloatTensor([1., 1., 1., 1., 1.]))
+    saliency = abs(X.grad.data)
+    # 对于每个像素，选择三个通道值最大的一个
+    saliency, _ = torch.max(saliency, dim=1)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -76,7 +83,25 @@ def make_fooling_image(X, target_y, model):
     ##############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    iter_num = 0
+    while True:
+        scores = model(X_fooling)
+        y = scores.data.max(1)[1][0]
+        # 如果最高分数的label和target_y一致，则退出循环
+        if y == target_y:
+            break
+        # 反向传播（根据target_y所在的分数）
+        target_score = scores[0, target_y]
+        target_score.backward()
+        # 更新图像梯度（梯度上升）
+        grad = X_fooling.grad.data
+        grad = learning_rate * grad / grad.norm()
+        X_fooling.data += grad
+        # 防止梯度积累，将梯度置为零
+        X_fooling.grad.data.zero_()
+        iter_num += 1
+    print('max iters:', iter_num)
+        
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -94,7 +119,13 @@ def class_visualization_update_step(img, model, target_y, l2_reg, learning_rate)
     ########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    scores = model(img)
+    i_ =  scores - l2_reg * img.data.norm()
+    target_score = i_[:, target_y]
+    target_score.backward()
+    grad = img.grad.data
+    img.data += learning_rate * grad / grad.norm()
+    img.grad.zero_()
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ########################################################################
